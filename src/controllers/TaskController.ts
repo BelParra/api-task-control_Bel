@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppError } from '../errors';
-import { TaskService } from '../services/TaskService';
+import { TaskService } from '../services';
 
 export class TaskController {
     private taskService: TaskService = new TaskService();

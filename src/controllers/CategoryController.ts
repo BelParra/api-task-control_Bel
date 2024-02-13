@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CategoryService } from "../services/CategoryService";
+import { CategoryService } from "../services";
 import { AppError } from "../errors";
 
 export class CategoryController {

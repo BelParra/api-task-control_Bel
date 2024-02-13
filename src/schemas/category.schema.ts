@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TaskSchema } from "./task.schema";
+import { TaskSchema } from "../schemas";
 
 export const CategorySchema = z.object({
     id: z.number().int(),

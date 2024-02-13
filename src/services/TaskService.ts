@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { TaskCreate, TaskReturn, TaskUpdate } from "../interfaces/task.interface";
+import { TaskCreate, TaskReturn, TaskUpdate } from "../interfaces";
 import { TaskCreateSchema, TaskReturnSchema } from "../schemas";
 import { AppError } from "../errors";
 import { ZodError } from "zod";

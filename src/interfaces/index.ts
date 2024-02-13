@@ -1,3 +1,4 @@
-import { TaskCreateSchema, TaskUpdateSchema } from "../schemas";
+import { CategoryCreate, CategoryReturn } from "./category.interface";
+import { TaskCreate, TaskUpdate, TaskReturn } from "./task.interface";
 
-export { TaskCreateSchema, TaskUpdateSchema };
+export { CategoryCreate, CategoryReturn, TaskCreate, TaskUpdate, TaskReturn };

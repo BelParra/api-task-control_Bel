@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ensure } from "../middlewares";
 import { CategoryCreateSchema } from "../schemas";
-import { CategoryController } from "../controllers/CategoryController";
+import { CategoryController } from "../controllers";
 
 export const categoryRouter = Router();
 const controller = new CategoryController();

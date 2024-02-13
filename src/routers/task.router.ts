@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ensure } from "../middlewares";
 import { TaskCreateSchema, TaskUpdateSchema } from "../schemas";
-import { TaskController } from "../controllers/TaskController";
+import { TaskController } from "../controllers";
 
 export const taskRouter = Router();
 const controller = new TaskController();

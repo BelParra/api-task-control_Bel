@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { prisma } from "../database/prisma";
 import { AppError } from "../errors";
-import { CategoryCreate, CategoryReturn } from "../interfaces/category.interface";
-import { CategoryCreateSchema, CategoryReturnSchema } from "../schemas";
+import { CategoryCreate} from "../interfaces";
+import { CategoryCreateSchema } from "../schemas";
 
 export class CategoryService {
 

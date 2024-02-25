@@ -71,8 +71,13 @@ export class TaskService {
             },
             include: { category: true }
         });
-        return task ? TaskReturnSchema.parse(task) : null;
-    }
+    
+        if (!task) {
+            throw new Error('Task not found');
+        }
+    
+        return TaskReturnSchema.parse(task);
+    };
 
     public async update(id: number, data: TaskUpdate | null): Promise<TaskReturn> {
         try {

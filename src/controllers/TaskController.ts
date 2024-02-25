@@ -39,14 +39,10 @@ export class TaskController {
         try {
             const { id } = req.params;
             const task = await this.taskService.readOne(parseInt(id));
-            if (task) {
-                return res.status(200).json(task);
-            } else {
-                throw new AppError('Task not found', 404);
-            }
+            return res.status(200).json(task);
         } catch (error) {
-            if (error instanceof AppError) {
-                return res.status(error.status).json({ message: error.message });
+            if (error.message === 'Task not found') {
+                return res.status(404).json({ message: error.message });
             } else {
                 console.error(error);
                 return res.status(500).json({ message: 'Internal Server Error' });

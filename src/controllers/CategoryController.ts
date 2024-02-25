@@ -26,12 +26,12 @@ export class CategoryController {
       await categoryService.delete(categoryId);
       res.status(204).send();
     } catch (error) {
-      if (error instanceof AppError) {
-        res.status(error.status).json({ message: error.message });
+      if (error.message === 'Category not found') {
+        res.status(404).json({ message: error.message });
       } else {
-        console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
       }
     }
   };
 }    
+

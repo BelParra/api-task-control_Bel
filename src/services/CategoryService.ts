@@ -27,9 +27,6 @@ export class CategoryService {
         }
     }
     
-    
-
-
     public delete = async (id: number): Promise<void> => {
         const category = await prisma.category.findUnique({ where: { id } });
 

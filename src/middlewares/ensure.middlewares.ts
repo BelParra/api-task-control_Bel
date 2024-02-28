@@ -33,7 +33,7 @@ class EnsureMiddleware {
       return next();
     };
 
-  public isOwnerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public isOwnerTask = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userTokenId = Number(res.locals.userId);
     const task = res.locals.task;
 
@@ -46,6 +46,7 @@ class EnsureMiddleware {
 
     return next();
   };
+
 
   public categoryExists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const id = Number(req.params.id);

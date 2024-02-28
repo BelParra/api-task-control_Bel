@@ -27,7 +27,7 @@ taskRouter.get("/:id",
 taskRouter.patch("/:id",
     auth.isAuthenticated,
     ensure.taskExists,
-    ensure.isOwnerUser,
+    ensure.isOwnerTask,
     ensure.validBody(TaskUpdateSchema),
     controller.update
 );
@@ -35,6 +35,6 @@ taskRouter.patch("/:id",
 taskRouter.delete("/:id",
     auth.isAuthenticated,
     ensure.taskExists,
-    ensure.isOwnerUser,
+    ensure.isOwnerTask,
     controller.delete
 );

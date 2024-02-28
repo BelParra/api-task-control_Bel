@@ -31,6 +31,12 @@ model User {
   name       String
   email      String     @unique
   password   String
+  role       Role       @default(USER)
   Task       Task[]
   categories Category[]
+}
+
+enum Role {
+  USER 
+  ADMIN
 }

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { CategoryService } from "../services";
 import { AppError } from "../errors";
-import { prisma } from "../database/prisma";
 
 export class CategoryController {
   private categoryService: CategoryService = new CategoryService();
@@ -21,37 +20,13 @@ export class CategoryController {
   };
 
   public delete = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const userId = Number(res.locals.userId);
-      const { id } = req.params;
-      const categoryId = parseInt(id);
-  
-      const category = await prisma.category.findUnique({ where: { id: categoryId } });
-      if (!category) {
-        throw new AppError('Category not found', 404);
-      }
-  
-      if (category.userId !== userId) {
-        throw new AppError('Forbidden', 403);
-      }
-  
-      const categoryService = new CategoryService();
-      await categoryService.delete(userId, categoryId);
-      res.status(204).send();
-    } catch (error) {
-      console.log("Erro ao deletar a categoria:", error);
-      if (error.message === 'Category not found') {
-        res.status(404).json({ message: error.message });
-      } else if (error.message === 'Forbidden') {
-        res.status(403).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'Internal Server Error' });
-      }
-    }
+    const userId = Number(res.locals.userId);
+    const { id } = req.params;
+    const categoryId = parseInt(id);
+
+    const categoryService = new CategoryService();
+    await categoryService.delete(userId, categoryId);
+    res.status(204).send();
   };
-    
-  
-  
-  
 }
 

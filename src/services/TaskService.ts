@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 const prisma = new PrismaClient();
 
 export class TaskService {
-  public async create(taskData: TaskCreate): Promise<TaskReturn> {
+  public create = async (taskData: TaskCreate): Promise<TaskReturn> => {
     try {
       const validatedTaskData = TaskCreateSchema.parse(taskData);
       if (validatedTaskData.categoryId) {
@@ -36,7 +36,7 @@ export class TaskService {
       }
       throw error;
     }
-  }
+  };
 
   public readAll = async (userId: number, categoryName: string | undefined): Promise<TaskReturn[]> => {
     try {
@@ -64,7 +64,7 @@ export class TaskService {
     }
   };
 
-  public async readOne(userId: number, taskId: number): Promise<TaskReturn | null> {
+  public readOne = async (userId: number, taskId: number): Promise<TaskReturn | null> => {
     const task = await prisma.task.findFirst({
       where: {
         id: taskId,
@@ -74,22 +74,21 @@ export class TaskService {
     });
 
     if (!task) {
-      throw new Error('Task not found');
+      throw new AppError('Task not found');
     }
 
     return TaskReturnSchema.parse(task);
   };
 
-  public async update(userId: number, id: number, data: TaskUpdate | null): Promise<TaskReturn> {
+  public update = async (userId: number, id: number, data: TaskUpdate | null): Promise<TaskReturn> => {
     try {
-      const existingTask = await prisma.task.findUnique({
-        where: {
-          id,
-          userId
-        },
-      });
-      if (!existingTask) {
+      const task = await prisma.task.findUnique({ where: { id } });
+      if (!task) {
         throw new AppError('Task not found', 404);
+      }
+
+      if (task.userId !== userId) {
+        throw new AppError('Forbidden', 403);
       }
 
       if (!data) {
@@ -110,16 +109,16 @@ export class TaskService {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
-  public async delete(userId: number, id: number): Promise<void> {
+  public delete = async (userId: number, id: number): Promise<void> => {
     try {
       const existingTask = await prisma.task.findUnique({
         where: { id, userId },
       });
 
       if (!existingTask) {
-        throw new AppError('Task not found', 404);
+        throw new AppError('Forbidden', 403);
       }
 
       await prisma.task.delete({
@@ -128,5 +127,5 @@ export class TaskService {
     } catch (error) {
       throw error;
     }
-  }
+  };
 }

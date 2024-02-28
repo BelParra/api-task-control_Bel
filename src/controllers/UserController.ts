@@ -12,7 +12,6 @@ export class UserController {
     public create = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userData: UserCreate = req.body;
-            console.log("Dados do usuário recebidos no controller:", userData);
             const validData = UserCreateSchema.parse(userData);
             const newUser = await this.userService.create(validData);
             return res.status(201).json(newUser);

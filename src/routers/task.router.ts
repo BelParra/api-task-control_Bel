@@ -20,19 +20,21 @@ taskRouter.get("/",
 
 taskRouter.get("/:id",
     auth.isAuthenticated,
+    ensure.taskExists,
     controller.readOne
 );
 
 taskRouter.patch("/:id",
     auth.isAuthenticated,
-    //ensure.isOwnerUser,
     ensure.taskExists,
+    ensure.isOwnerUser,
     ensure.validBody(TaskUpdateSchema),
     controller.update
 );
 
 taskRouter.delete("/:id",
     auth.isAuthenticated,
-    //ensure.isOwnerUser,
+    ensure.taskExists,
+    ensure.isOwnerUser,
     controller.delete
 );

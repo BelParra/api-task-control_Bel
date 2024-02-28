@@ -39,34 +39,26 @@ export class TaskController {
     };
 
     public readOne = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const userId = Number(res.locals.userId);
-            const { id } = req.params;
-            const task = await this.taskService.readOne(userId, parseInt(id));
-            return res.status(200).json(task);
-        } catch (error) {
-            if (error.message === 'Task not found') {
-                return res.status(404).json({ message: error.message });
-            } else {
-                console.error(error);
-                return res.status(500).json({ message: 'Internal Server Error' });
-            }
+      try {
+        const userId = Number(res.locals.userId);
+        const task = await this.taskService.readOne(userId, parseInt(req.params.id));
+        return res.status(200).json(task);
+      } catch (error) {
+        if (error.message === 'Task not found') {
+          return res.status(404).json({ message: error.message });
+        } else {
+          console.error(error);
+          return res.status(500).json({ message: 'Internal Server Error' });
         }
+      }
     };
 
     public update = async (req: Request, res: Response): Promise<Response> => {
         try {
           const userId = Number(res.locals.userId);
-          const { id } = req.params;
-          const taskId = parseInt(id);
+          const taskId = parseInt(req.params.id);
       
-          const task = await prisma.task.findUnique({ where: { id: taskId } });
-          if (!task || task.userId !== userId) {
-            throw new AppError('Forbidden', 403);
-          }
-      
-          const taskService = new TaskService();
-          const updatedTask = await taskService.update(userId, taskId, req.body);
+          const updatedTask = await this.taskService.update(userId, taskId, req.body);
           return res.status(200).json(updatedTask);
         } catch (error) {
           if (error instanceof AppError) {
@@ -84,16 +76,7 @@ export class TaskController {
           const { id } = req.params;
           const taskId = parseInt(id);
       
-          // Primeiro, verifique se a tarefa existe
           const task = await prisma.task.findUnique({ where: { id: taskId } });
-          if (!task) {
-            throw new AppError('Task not found', 404);
-          }
-      
-          // Em seguida, verifique se o usuário é o proprietário da tarefa
-          if (task.userId !== userId) {
-            throw new AppError('Forbidden', 403);
-          }
       
           const taskService = new TaskService();
           await taskService.delete(userId, taskId);
@@ -107,6 +90,4 @@ export class TaskController {
           }
         }
       };
-      
-      
 }    

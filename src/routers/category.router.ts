@@ -14,5 +14,6 @@ categoryRouter.post("/",
 
 categoryRouter.delete("/:id",
     auth.isAuthenticated,
-    //ensure.isOwnerUser,
+    ensure.categoryExists,
+    ensure.isOwnerCategory,
     controller.delete);

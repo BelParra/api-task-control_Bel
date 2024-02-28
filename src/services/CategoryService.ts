@@ -6,7 +6,7 @@ import { CategoryCreateSchema } from "../schemas";
 
 export class CategoryService {
 
-    public async create(categoryData: CategoryCreate): Promise<{ id: number; name: string; }> {
+    public create = async (categoryData: CategoryCreate): Promise<{ id: number; name: string; }> => {
         try {
 
             const validData = CategoryCreateSchema.parse(categoryData);
@@ -27,14 +27,9 @@ export class CategoryService {
             }
             throw new AppError('Internal Server Error', 500);
         }
-    }
-
-    public delete = async (userId: number, id: number): Promise<void> => {
-        const category = await prisma.category.findUnique({ where: { id, userId } });
-        if (!category) {
-            throw new AppError('Category not found', 404);
-        }
-        await prisma.category.delete({ where: { id, userId } });
     };
 
+    public delete = async (userId: number, id: number): Promise<void> => {
+        await prisma.category.delete({ where: { id, userId } });
+    };
 }

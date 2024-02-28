@@ -11,16 +11,6 @@ class EnsureMiddleware {
     this.prisma = prisma;
   }
 
-  public taskExists =
-    async (req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>> => {
-      const id = Number(req.params.id);
-      const existingTask = await this.prisma.task.findUnique({ where: { id } });
-      if (!existingTask) {
-        return res.status(404).json({ message: "Task not found" });
-      }
-      return next();
-    };
-
   public userExists =
     async (req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>> => {
       const userId = Number(req.body.userId);
@@ -31,17 +21,56 @@ class EnsureMiddleware {
       return next();
     };
 
+  public taskExists =
+    async (req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>> => {
+      const id = Number(req.params.id);
+      const existingTask = await this.prisma.task.findUnique({ where: { id } });
+
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      res.locals.task = existingTask;
+      return next();
+    };
+
   public isOwnerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userTokenId = Number(res.locals.userId);
-    const userId = Number(req.params.userId);
+    const task = res.locals.task;
 
-    if (userTokenId !== userId) {
-      throw new AppError('User is not authorized to perform this action.', 403);
+    const user = await this.prisma.user.findUnique({ where: { id: userTokenId } });
+    const isAdmin = user && user.role === 'USER';
+
+    if (task.userId !== userTokenId && !isAdmin) {
+      throw new AppError('Forbidden', 403);
     }
 
     return next();
   };
 
+  public categoryExists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const id = Number(req.params.id);
+    const category = await this.prisma.category.findUnique({ where: { id } });
+
+    if (!category) {
+      res.status(404).json({ message: 'Category not found' });
+      return;
+    }
+
+    res.locals.category = category;
+    next();
+  };
+
+  public isOwnerCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const userId = Number(res.locals.userId);
+    const category = res.locals.category;
+
+    if (category.userId !== userId) {
+      res.status(403).json({ message: 'Forbidden' });
+      return;
+    }
+
+    next();
+  };
 
   public addUserIdToBody = async (req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>> => {
     req.body.userId = Number(res.locals.userId);
@@ -52,15 +81,11 @@ class EnsureMiddleware {
     (schema: AnyZodObject) =>
       async (req: Request, res: Response, next: NextFunction): Promise<void | Response<any, Record<string, any>>> => {
         try {
-          console.log("Corpo da requisição antes da validação:", req.body);
           req.body = schema.parse(req.body);
-          console.log("Corpo da requisição após a validação:", req.body);
 
           return next();
         } catch (error) {
-          console.log("Corpo da requisição que causou o erro:", req.body);
           if (error instanceof ZodError) {
-            console.log("Está ocorrendo um erro no validBody");
             console.log(error.errors);
             return res.status(400).json({ message: "Invalid request body" });
           }

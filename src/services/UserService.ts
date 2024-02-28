@@ -1,14 +1,14 @@
 import { sign } from "jsonwebtoken";
 import { prisma } from "../database/prisma";
 import { AppError } from "../errors";
-import { UserCreate } from "../interfaces";
+import { UserCreate, UserAuth} from "../interfaces";
 import { UserCreateSchema } from "../schemas";
-import { userReturn } from "../interfaces";
+import { UserReturn } from "../interfaces";
 import bcrypt from 'bcrypt';
 
 export class UserService {
 
-  public async create(userData: UserCreate): Promise<{ id: number; name: string; email: string; }> {
+  public create = async (userData: UserCreate): Promise<UserAuth> => {
     const validData = UserCreateSchema.parse(userData);
 
     const existingUser = await prisma.user.findUnique({ where: { email: validData.email } });
@@ -29,29 +29,28 @@ export class UserService {
     return { id: newUser.id, name: newUser.name, email: newUser.email };
   }
 
-
   public login = async ({
     name,
     email,
     password,
-  }: UserCreate): Promise<userReturn> => {
+  }: UserCreate): Promise<UserReturn> => {
     const foundUser = await prisma.user.findFirst({ where: { email, name } });
     if (!foundUser) {
       throw new AppError("User not exists");
     }
-
+  
     const pwdMatch = await bcrypt.compare(password, foundUser.password);
     if (!pwdMatch) {
       throw new AppError("Email and password doesn't match");
     }
-
-    const secret = process.env.SECRET_KEY!;
+  
+    const secret = process.env.JWT_SECRET!;
     const expiresIn = process.env.EXPIRES_IN!;
     const token = sign({ email: foundUser.email }, secret, {
       expiresIn,
       subject: foundUser.id.toString(),
     });
-    
+  
     return {
       accessToken: token,
       user: {
@@ -60,10 +59,22 @@ export class UserService {
         email: foundUser.email
       }
     };
-};
+  };
+  
+  public getProfile = async (userId: number): Promise<UserAuth | null> => {
+    try {
+      const userProfile = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, name: true, email: true },
 
+      });
 
-
+      return userProfile;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      throw new AppError('Error fetching user profile', 500);
+    }
+  }
 
 }
 

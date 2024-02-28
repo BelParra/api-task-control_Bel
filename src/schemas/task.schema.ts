@@ -12,7 +12,9 @@ export const TaskCreateSchema = z.object({
   title: z.string(),
   content: z.string(),
   categoryId: z.number().optional(),
+  userId: z.number(),
 });
+
 
 export const TaskReturnSchema = z.object({
   id: z.number().int(),

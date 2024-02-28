@@ -3,8 +3,8 @@ import { UserService } from '../services';
 import { UserCreate } from '../interfaces';
 import { UserCreateSchema } from '../schemas';
 import { z } from 'zod';
-import { prisma } from '../database/prisma';
 import { AppError } from '../errors';
+
 
 export class UserController {
     private userService: UserService = new UserService();
@@ -12,6 +12,7 @@ export class UserController {
     public create = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userData: UserCreate = req.body;
+            console.log("Dados do usuário recebidos no controller:", userData);
             const validData = UserCreateSchema.parse(userData);
             const newUser = await this.userService.create(validData);
             return res.status(201).json(newUser);
@@ -35,7 +36,7 @@ export class UserController {
             console.error(error);
 
             if (error instanceof z.ZodError) {
-                return res.status(409).json({ message: 'Invalidbuceta request body' });
+                return res.status(409).json({ message: 'Invalid request body' });
             } else if (error.message === 'User not exists') {
                 return res.status(404).json({ message: error.message });
             } else if (error.message === "Email and password doesn't match") {
@@ -47,4 +48,19 @@ export class UserController {
             }
         };
     };
-}    
+
+    public getProfile = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const userId = Number(res.locals.userId);
+            if (!userId) {
+                throw new AppError("User ID not found", 400);
+            }
+            const userProfile = await this.userService.getProfile(userId);
+            return res.status(200).json(userProfile);
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            return res.status(500).json({ message: 'Error fetching user profile' });
+        }
+    };
+
+}

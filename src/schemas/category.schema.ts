@@ -9,6 +9,7 @@ export const CategorySchema = z.object({
 
 export const CategoryCreateSchema = z.object({
     name: z.string(),
+    userId: z.number(),
 });
 
 export const CategoryReturnSchema = z.object({

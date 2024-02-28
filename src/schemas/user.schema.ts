@@ -1,18 +1,18 @@
 import { z } from 'zod';
 
+
 export const UserCreateSchema = z.object({
-    name: z.string(),
-    email: z.string().email(),
-    password: z.string().min(8),
+  name: z.string(),
+  email: z.string().email(),
+  password: z.string().min(4),
 });
 
 export const UserLoginSchema = z.object({
-    name: z.string(),
-    email: z.string().email(),
-    password: z.string().min(8),
-})
+  email: z.string().email(),
+  password: z.string(),
+});
 
-export const userReturnSchema = z.object({
+export const UserAuthenticatedSchema = z.object({
   accessToken: z.string(),
   user: z.object({
     id: z.number(),
@@ -21,3 +21,8 @@ export const userReturnSchema = z.object({
   }),
 });
 
+export const NewUserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+});
